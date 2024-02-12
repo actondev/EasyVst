@@ -178,39 +178,39 @@ int main(int argc, char *argv[])
         unsigned int numMidiPorts = midiIn->getPortCount();
         if (numMidiPorts == 0) {
                 std::cerr << "No MIDI inputs available on your system" << std::endl;
-                return 1;
-        }
-
-        int selectedIndex = 0;
-        if (numMidiPorts == 1) {
-                selectedIndex = 0;
         } else {
-                std::cout << "Please type the number that corresponds to the MIDI device you'd like to use and press ENTER" << std::endl;
-                for (unsigned int i = 0; i < numMidiPorts; ++i) {
-                        try {
-                                std::string portName = midiIn->getPortName(i);
-                                std::cout << (i + 1) << ") " << portName << std::endl;
-                        } catch (RtMidiError &err) {
-                                err.printMessage();
-                                return 1;
-                        }
-                }
-                std::cin >> selectedIndex;
-                --selectedIndex;
-        }
 
-        if (selectedIndex < 0 || selectedIndex >= numMidiPorts) {
-                std::cerr << "Invalid MIDI device selection" << std::endl;
-                return 1;
-        }
-        std::string selectedPortName = midiIn->getPortName(selectedIndex);
-        std::cout << "You have selected device: " << selectedPortName << std::endl;
-        try {
-                midiIn->openPort(selectedIndex);
-                midiIn->setCallback(&midiCallback, &userData);
-        } catch (RtMidiError &err) {
+          int selectedIndex = 0;
+          if (numMidiPorts == 1) {
+            selectedIndex = 0;
+          } else {
+            std::cout << "Please type the number that corresponds to the MIDI device you'd like to use and press ENTER" << std::endl;
+            for (unsigned int i = 0; i < numMidiPorts; ++i) {
+              try {
+                std::string portName = midiIn->getPortName(i);
+                std::cout << (i + 1) << ") " << portName << std::endl;
+              } catch (RtMidiError &err) {
                 err.printMessage();
                 return 1;
+              }
+            }
+            std::cin >> selectedIndex;
+            --selectedIndex;
+          }
+
+          if (selectedIndex < 0 || selectedIndex >= numMidiPorts) {
+            std::cerr << "Invalid MIDI device selection" << std::endl;
+            return 1;
+          }
+          std::string selectedPortName = midiIn->getPortName(selectedIndex);
+          std::cout << "You have selected device: " << selectedPortName << std::endl;
+          try {
+            midiIn->openPort(selectedIndex);
+            midiIn->setCallback(&midiCallback, &userData);
+          } catch (RtMidiError &err) {
+            err.printMessage();
+            return 1;
+          }
         }
 
         if (!userData.vst.createView()) {
