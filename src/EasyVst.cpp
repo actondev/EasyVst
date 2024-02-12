@@ -322,6 +322,11 @@ bool EasyVst::createView()
 		_printError("Editor view does not support HWND");
 		return false;
 }
+#elif defined(__LINUX__)
+          if (_view->isPlatformTypeSupported(Steinberg::kPlatformTypeX11EmbedWindowID) != Steinberg::kResultTrue) {
+    _printError("Editor view does not support X11EmbedWindowID");
+    return false;
+  }
 #else
 	_printError("Platform is not supported yet");
 	return false;
@@ -339,10 +344,17 @@ bool EasyVst::createView()
 		_printError("Failed to attach editor view to HWND");
 		return false;
 	}
-#endif
-
-	return true;
+#elif defined(__LINUX__)
+	if (_view->attached((void*)wmInfo.info.x11.window, Steinberg::kPlatformTypeX11EmbedWindowID) != Steinberg::kResultOk) {
+          std::cout << "Failed to attach editor view to HWND " << std::endl;
+		return false;
 	}
+#else
+          _printError("Platform is not supported yet");
+          return false;
+#endif
+        return true;
+}
 
 void EasyVst::destroyView()
 {

@@ -5,28 +5,41 @@ CPMAddPackage(
     URL "https://download.steinberg.net/sdk_downloads/vst-sdk_3.7.7_build-19_2022-12-12.zip"
 )
 
-add_library(VST_SDK
+set(VST_SDK_SRC
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/connectionproxy.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/eventlist.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/hostclasses.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/module.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/parameterchanges.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/pluginterfacesupport.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/plugprovider.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/processdata.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/utility/stringconvert.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/vstinitiids.cpp
 
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/connectionproxy.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/eventlist.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/hostclasses.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/module.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/pluginterfaces/base/conststringtable.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/pluginterfaces/base/coreiids.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/pluginterfaces/base/funknown.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/base/source/fobject.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/base/source/fdebug.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/base/source/updatehandler.cpp
+  ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/base/thread/source/flock.cpp
+)
+
+if(WIN32)
+  list(APPEND VST_SDK_SRC
     ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/module_win32.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/parameterchanges.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/pluginterfacesupport.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/plugprovider.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/processdata.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/utility/stringconvert.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/vstinitiids.cpp
     ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/common/threadchecker_win32.cpp
+  )
+elseif(LINUX)
+  list(APPEND VST_SDK_SRC
+    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/vst/hosting/module_linux.cpp
+    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/public.sdk/source/common/threadchecker_linux.cpp
+  )
+endif()
 
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/pluginterfaces/base/conststringtable.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/pluginterfaces/base/coreiids.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/pluginterfaces/base/funknown.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/base/source/fobject.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/base/source/fdebug.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/base/source/updatehandler.cpp
-    ${VSTModuleArchitectureSDK_SOURCE_DIR}/vst3sdk/base/thread/source/flock.cpp
+add_library(VST_SDK
+  ${VST_SDK_SRC}
 )
 
 target_include_directories(VST_SDK
@@ -40,8 +53,8 @@ target_compile_definitions(VST_SDK
 
 CPMAddPackage(
     NAME SDL2
-    VERSION  2.0.22
-    URL https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.22.zip
+    VERSION  2.30.0
+    URL https://github.com/libsdl-org/SDL/releases/download/release-2.30.0/SDL2-2.30.0.zip
     OPTIONS
         "SDL_SHARED Off"
 )
@@ -72,10 +85,12 @@ add_library(RtMidi
 
 target_include_directories(RtMidi PUBLIC "${RtMidi_SOURCE_DIR}")
 
-target_compile_definitions(RtMidi
+IF (WIN32)
+  target_compile_definitions(RtMidi
     PUBLIC
-        "-D__WINDOWS_MM__"
-)
+    "-D__WINDOWS_MM__"
+  )
+ENDIF()
 
 CPMAddPackage(
     NAME concurrentqueue

@@ -28,8 +28,8 @@ target_link_libraries(EasyVst
         portaudio
         RtMidi
         concurrentqueue
-)
-
+	stdc++fs
+      )
 target_include_directories(EasyVst
     PRIVATE
         include
